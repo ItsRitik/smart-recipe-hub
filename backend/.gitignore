@@ -1,0 +1,11 @@
+node_modules
+dist
+.vscode
+.idea
+.env
+.env.*
+!.env.devops
+src/seed/assets/*
+!src/seed/assets/README.md
+src/sandbox.ts
+notes.txt
