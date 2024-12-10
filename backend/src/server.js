@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const dotenv = require("dotenv");
+const userRoutes = require("./routes/User");
 
 dotenv.config();
 
@@ -50,11 +51,8 @@ const client = new MongoClient(process.env.MONGO_URI, {
   }
   run().catch(console.dir);
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
+  app.use("/api", userRoutes);
+  
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
