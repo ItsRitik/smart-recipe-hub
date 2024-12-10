@@ -5,7 +5,7 @@ require("dotenv").config();
 const router = express.Router();
 
 // Initialize Gemini API Client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_LINK);
 
 // Route to generate recipe recommendations
 router.post("/gemini-recommend", async (req, res) => {
@@ -32,7 +32,14 @@ router.post("/gemini-recommend", async (req, res) => {
 
     const responseText = result.response.text();
 
-    res.status(200).json({ result: responseText });
+    // Example parsing of response text into a recipe object
+    const recommendation = {
+      title: "AI Generated Recipe",
+      steps: responseText,
+      image: "https://via.placeholder.com/300", // Placeholder image for now
+    };
+
+    res.status(200).json({ recommendations: [recommendation] }); // Ensure it returns an array
   } catch (error) {
     console.error("Error generating recipe:", error.message);
     res.status(500).json({ message: "Failed to fetch recipe recommendations." });
