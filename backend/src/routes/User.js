@@ -1,89 +1,36 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const axios = require("axios");
-require("dotenv").config();
-
+const User = require("../models/User");
 const router = express.Router();
 
-// Initialize Gemini API Client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_LINK);
+router.post("/save-user", async (req, res) => {
+  const { clerkUserId, email, name } = req.body;
 
-// Function to check if YouTube video is available
-const isYouTubeVideoAvailable = async (url) => {
-  try {
-    const response = await axios.get(url, { validateStatus: false });
-    return response.status === 200;
-  } catch (error) {
-    console.error("Error checking YouTube video:", error.message);
-    return false;
-  }
-};
+  console.log("Incoming Request:", req.body); // Debug log for incoming request
 
-// Function to fetch fallback recipe image
-const fetchRecipeImage = async (query) => {
-  const apiKey = process.env.PEXELS_API_KEY; // Use Pexels API or Unsplash
-  try {
-    const response = await axios.get(`https://api.pexels.com/v1/search`, {
-      headers: { Authorization: apiKey },
-      params: { query, per_page: 1 },
-    });
-    return response.data.photos[0]?.src?.medium || "https://via.placeholder.com/300";
-  } catch (error) {
-    console.error("Error fetching fallback image:", error.message);
-    return "https://via.placeholder.com/300"; // Placeholder fallback
-  }
-};
-
-// Route to generate recipe recommendations
-router.post("/gemini-recommend", async (req, res) => {
-  const { cuisine, ingredients } = req.body;
-
-  if (!cuisine || !ingredients) {
-    return res.status(400).json({ message: "Cuisine and ingredients are required." });
+  if (!clerkUserId || !email || !name) {
+    console.log("Invalid user data");
+    return res.status(400).json({ message: "Invalid user data" });
   }
 
   try {
-    // Build the AI prompt
-    const prompt = `
-      Suggest a recipe based on the following:
-      - Cuisine: ${cuisine}
-      - Ingredients: ${ingredients.join(", ")}
+    // Check if user exists
+    let user = await User.findOne({ clerkUserId });
+    console.log("User Check Result:", user);
 
-      Provide the following details:
-      - Recipe Title
-      - Steps to prepare the dish
-      - A YouTube video link or relevant video link for this recipe
-    `;
-
-    // Send prompt to Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-
-    // Parse response
-    const lines = responseText.split("\n");
-    const title = lines.find((line) => line.includes("Title:"))?.replace("Title:", "").trim() || "AI Generated Recipe";
-    const steps = lines.find((line) => line.includes("Steps:"))?.replace("Steps:", "").trim() || responseText;
-    let video = lines.find((line) => line.includes("http"))?.trim() || "";
-
-    // Check if video is valid; fetch fallback image if not
-    let image = "";
-    if (video && !(await isYouTubeVideoAvailable(video))) {
-      video = "";
-      image = await fetchRecipeImage(`${title} recipe`);
+    if (user) {
+      console.log("User already exists:", user);
+      return res.status(200).json({ message: "User already exists", user });
     }
 
-    const recommendation = {
-      title,
-      steps,
-      video,
-      image: video ? "" : image, // Provide fallback image if no video is available
-    };
+    // Create new user
+    user = new User({ clerkUserId, email, name });
+    await user.save();
+    console.log("User saved successfully:", user);
 
-    res.status(200).json({ recommendations: [recommendation] });
+    res.status(201).json({ message: "User saved successfully", user });
   } catch (error) {
-    console.error("Error generating recipe:", error.message);
-    res.status(500).json({ message: "Failed to fetch recipe recommendations." });
+    console.error("Error saving user data:", error.message);
+    res.status(500).json({ message: "Failed to save user data" });
   }
 });
 
