@@ -1,0 +1,38 @@
+.card {
+    background-color: #674636; /* Matches RecipeCard's color scheme */
+    border-radius: 15px;
+  }
+  
+  .form-label {
+    color: #f5deb3; /* Wheat color for labels */
+  }
+  
+  .form-control {
+    background-color: #c7c7c7; /* Dark input background */
+    color: #fff; /* Light text color */
+    border: 1px solid #555; /* Subtle border */
+  }
+  
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #ff7f50; /* Coral color for focus */
+  }
+  
+  .btn-success {
+    background-color: #ff7f50; /* Coral color for consistency */
+    border: none;
+  }
+  
+  .btn-success:hover {
+    background-color: #ff4500; /* Darker coral */
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+      
