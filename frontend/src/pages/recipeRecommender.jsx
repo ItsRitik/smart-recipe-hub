@@ -4,11 +4,10 @@ import { useUser } from "@clerk/clerk-react";
 import { Container, Form, Button, Alert, Spinner, Row, Col, Card } from "react-bootstrap";
 
 const RecipeRecommender = () => {
-  const { user } = useUser(); // Clerk user data
+  const { user } = useUser();
   const [cuisine, setCuisine] = useState("");
   const [ingredients, setIngredients] = useState("");
-const [recommendations, setRecommendations] = useState([]);
-
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,13 +23,17 @@ const [recommendations, setRecommendations] = useState([]);
         ingredients: ingredients.split(",").map((item) => item.trim()),
       });
       setRecommendations(response.data.recommendations);
-      console.log(recommendations);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setError("Failed to fetch recipe recommendations. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getEmbedUrl = (videoUrl) => {
+    const urlMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/))([^&?/\s]+)/);
+    return urlMatch ? `https://www.youtube.com/embed/${urlMatch[1]}` : null;
   };
 
   return (
@@ -57,47 +60,39 @@ const [recommendations, setRecommendations] = useState([]);
                 onChange={(e) => setIngredients(e.target.value)}
               />
             </Form.Group>
-            <div className="d-grid">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={fetchRecommendations}
-                disabled={loading}
-              >
-                {loading ? <Spinner animation="border" size="sm" /> : "Get Recipes"}
-              </Button>
-            </div>
+            <Button onClick={fetchRecommendations} disabled={loading} variant="primary">
+              {loading ? <Spinner animation="border" size="sm" /> : "Get Recipes"}
+            </Button>
           </Form>
-          {error && (
-            <Alert variant="danger" className="mt-3">
-              {error}
-            </Alert>
-          )}
+
+          {error && <Alert variant="danger">{error}</Alert>}
         </Col>
       </Row>
 
-      {recommendations?.length > 0 && (
-  <Row className="mt-5">
-    <h3 className="text-center mb-4">Recommended Recipes</h3>
-    {recommendations.map((rec, index) => (
-      <Col key={index} xs={12} sm={6} md={4} lg={3} className="mb-4">
-        <Card className="h-100 shadow-sm">
-          <Card.Img
-            variant="top"
-            src={rec.image || "https://via.placeholder.com/300"}
-            alt={rec.title}
-            style={{ objectFit: "cover", height: "180px" }}
-          />
-          <Card.Body className="d-flex flex-column">
-            <Card.Title>{rec.title}</Card.Title>
-            <Card.Text style={{ flex: "1" }}>{rec.steps}</Card.Text>
-          </Card.Body>
-        </Card>
-      </Col>
-    ))}
-  </Row>
-)}
-
+      {recommendations.map((rec, index) => (
+        <Row key={index} className="mt-4">
+          <Col xs={12}>
+            <Card>
+              <Card.Body>
+                <Card.Title>{rec.title}</Card.Title>
+                <Card.Text>{rec.steps}</Card.Text>
+                {rec.video ? (
+                  <div className="ratio ratio-16x9">
+                    <iframe
+                      src={getEmbedUrl(rec.video)}
+                      title={rec.title}
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                ) : (
+                  <Card.Img variant="top" src={rec.image} alt={rec.title} />
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      ))}
     </Container>
   );
 };
