@@ -1,6 +1,12 @@
 import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import {
+  SignInButton,
+  UserButton,
+  SignedIn,
+  SignedOut,
+} from "@clerk/clerk-react";
 
 const NavigationBar = () => {
   return (
@@ -21,6 +27,16 @@ const NavigationBar = () => {
             <Nav.Link as={Link} to="/profile">
               Profile
             </Nav.Link>
+          </Nav>
+          <Nav>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="btn btn-outline-light">Sign In</button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </Nav>
         </Navbar.Collapse>
       </Container>
