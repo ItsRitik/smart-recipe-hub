@@ -2,7 +2,7 @@
 
 import "./RecipeCard.css";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Helper function to generate random usernames
@@ -28,6 +28,16 @@ const RecipeCard = ({ recipe }) => {
 
   const handleModalOpen = () => setShowModal(true);
   const handleModalClose = () => setShowModal(false);
+
+  // UseEffect to handle body scroll
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => document.body.classList.remove("no-scroll");
+  }, [showModal]);
 
   // Use a fallback value for instructions
   const instructions = typeof recipe.instructions === "string" ? recipe.instructions : "";
@@ -55,7 +65,7 @@ const RecipeCard = ({ recipe }) => {
         <div className="col-md-5">
           <div className="card-body">
             <h2 className="card-title">{recipe.title}</h2>
-            <p className="card-text text-muted">{recipe.description}</p>
+            <p className="card-text">{recipe.description}</p>
 
             <h4>Ingredients:</h4>
             <div className="row">
