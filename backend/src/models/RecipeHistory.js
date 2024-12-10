@@ -7,6 +7,8 @@ const recipeHistorySchema = new mongoose.Schema({
   recommendedRecipes: [
     {
       title: { type: String },
+      ingredients: [{ type: String }], // Added ingredients array
+      instructions: [{ type: String }],
       steps: { type: String },
       image: { type: String },
       createdAt: { type: Date, default: Date.now },
