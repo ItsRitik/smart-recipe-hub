@@ -8,8 +8,7 @@ const HomePage = () => {
       image: "src/assets/biryani.png", // Replace with actual image URL
       description: "A mixed rice dish popular in South Asia, made with spices, rice, and meat.",
       ingredients: ["Chicken: 150g", "Rice: 100g", "Onions: 3 medium", "Tomatoes: 2 medium"],
-      instructions:
-        "Put the boiling water in a saucepan, add the washed rice, boil for 5 minutes and drain. Layer the chicken mixture with the rice starting with the rice, then the chicken mixture, and repeat this twice. Garnish with cumin seeds and ginger.",
+      instructions:"Put the boiling water in a saucepan, add the washed rice, boil for 5 minutes and drain. Layer the chicken mixture with the rice starting with the rice, then the chicken mixture, and repeat this twice. Garnish with cumin seeds and ginger.",
       
       comments: ["Good recipe", "Loved it", "Could use more spices!"],
     },
@@ -37,7 +36,7 @@ const HomePage = () => {
           "Oil: for frying"
         ],
         instructions:
-          "1. Mix cabbage, carrot, capsicum, all-purpose flour, cornflour, ginger-garlic paste, salt, and pepper in a bowl. Form small balls from the mixture. \n2. Heat oil in a pan and deep-fry the balls until golden brown. Set aside. \n3. In another pan, heat a little oil and sauté ginger, garlic, and spring onions. Add soy sauce, tomato ketchup, vinegar, and a little water to create the sauce. \n4. Add the fried vegetable balls to the sauce and mix well. Cook for 2-3 minutes until the balls are coated with the sauce. \n5. Garnish with spring onions and serve hot.",
+          "Mix cabbage, carrot, capsicum, all-purpose flour, cornflour, ginger-garlic paste, salt, and pepper in a bowl. Form small balls from the mixture. Heat oil in a pan and deep-fry the balls until golden brown. Set aside. In another pan, heat a little oil and sauté ginger, garlic, and spring onions. Add soy sauce, tomato ketchup, vinegar, and a little water to create the sauce. Add the fried vegetable balls to the sauce and mix well. Cook for 2-3 minutes until the balls are coated with the sauce. Garnish with spring onions and serve hot.",
         comments: ["Delicious and easy to make!", "Perfect with fried rice!", "Tastes just like restaurant-style!"]
       
     },
