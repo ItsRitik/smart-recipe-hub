@@ -11,51 +11,103 @@ import {
   Row,
   Col,
   Card,
-  ListGroup,
+  Modal,
 } from "react-bootstrap";
 
-const RecipeCard = ({ recipe }) => (
-  <Card className="mb-4 shadow-sm text-center" style={{ cursor: "pointer" }}>
-    <Card.Img
-      variant="top"
-      src={recipe?.image || "https://via.placeholder.com/300"}
-      alt={recipe?.title || "Recipe Image"}
-      style={{ objectFit: "cover", height: "180px" }}
-    />
-    <Card.Body>
-      <Card.Title>{recipe?.title || "No Title Available"}</Card.Title>
+// RecipeCard Component
+const RecipeCard = ({ recipe }) => {
+  const [showModal, setShowModal] = useState(false);
 
-      {/* Ingredients
-      <Card.Subtitle className="mb-2 text-muted">Ingredients</Card.Subtitle>
-      {recipe?.ingredients && recipe.ingredients.length > 0 ? (
-        <ListGroup variant="flush">
-          {recipe.ingredients.map((ingredient, index) => (
-            <ListGroup.Item key={index}>{ingredient}</ListGroup.Item>
-          ))}
-        </ListGroup>
-      ) : (
-        <p>No ingredients available</p>
-      )} */}
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
-      {/* Instructions */}
-      <Card.Subtitle className="mt-3 mb-2 text-muted">
-        Instructions
-      </Card.Subtitle>
-      {recipe?.steps ? (
-        <div>
-          {recipe.steps.split("\n").map((step, index) => (
-            <p key={index}>
-              <Markdown>{step}</Markdown>
-            </p>
-          ))}
-        </div>
-      ) : (
-        <p>No instructions available</p>
-      )}
-    </Card.Body>
-  </Card>
-);
+  return (
+    <>
+      <Card
+        className="mb-4 shadow-sm recipe-card"
+        style={{
+          cursor: "pointer",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.03)";
+          e.currentTarget.style.boxShadow = "0 10px 25px rgba(0, 0, 0, 0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+        }}
+      >
+        <Card.Img
+          variant="top"
+          src={recipe?.image || "https://via.placeholder.com/300"}
+          alt={recipe?.title || "Recipe Image"}
+          style={{
+            objectFit: "cover",
+            height: "200px",
+            borderTopLeftRadius: "8px",
+            borderTopRightRadius: "8px",
+          }}
+        />
+        <Card.Body className="text-center">
+          <Card.Title className="fw-bold">
+            {recipe?.title || "No Title"}
+          </Card.Title>
+          <Card.Text className="text-muted mb-3">
+            {recipe?.description || "A delicious recipe to try out!"}
+          </Card.Text>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            className="mt-2"
+            onClick={handleShowModal}
+          >
+            View Details
+          </Button>
+        </Card.Body>
+      </Card>
 
+      {/* Modal for Viewing Recipe Details */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{recipe?.title || "Recipe Details"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card.Img
+            variant="top"
+            src={recipe?.image || "https://via.placeholder.com/300"}
+            alt={recipe?.title || "Recipe Image"}
+            style={{
+              objectFit: "cover",
+              maxHeight: "300px",
+              marginBottom: "20px",
+              borderRadius: "8px",
+            }}
+          />
+          <h5>Instructions</h5>
+          {recipe?.steps ? (
+            <div>
+              {recipe.steps.split("\n").map((step, index) => (
+                <p key={index}>
+                  <Markdown>{step}</Markdown>
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p>No instructions available.</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+// RecipeRecommender Component
 const RecipeRecommender = () => {
   const { user } = useUser();
   const [cuisine, setCuisine] = useState("");
@@ -146,7 +198,6 @@ const RecipeRecommender = () => {
               xs={12}
               sm={6}
               md={4}
-              lg={3}
               className="d-flex justify-content-center"
             >
               <RecipeCard recipe={rec} />
