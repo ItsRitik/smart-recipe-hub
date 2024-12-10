@@ -46,3 +46,13 @@
 .btn-secondary:hover {
   background-color: #502d25;
 }
+
+.card-text {
+  color: #d8a886;
+  font-weight: 500;
+  
+}
+
+.no-scroll {
+  overflow: hidden;
+}
