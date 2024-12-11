@@ -11,8 +11,11 @@
     background-color: #c7c7c7; /* Dark input background */
     color: #fff; /* Light text color */
     border: 1px solid #555; /* Subtle border */
+    
   }
   
+
+
   .form-control:focus {
     box-shadow: none;
     border-color: #ff7f50; /* Coral color for focus */
@@ -35,4 +38,3 @@
   .btn-secondary:hover {
     background-color: #5a6268;
   }
-      

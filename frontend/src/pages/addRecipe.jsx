@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./addRecipe.css";
 
 const AddRecipe = () => {
   const [recipeData, setRecipeData] = useState({
