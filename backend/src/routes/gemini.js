@@ -52,7 +52,7 @@ router.post("/gemini-recommend", async (req, res) => {
       Provide the following details:
       - Recipe Title
       - Steps to prepare the dish
-      - A YouTube video link or relevant video link for this recipe
+      - Reference video link that is published
     `;
 
     // Send prompt to Gemini

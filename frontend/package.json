@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "proxy":"http://localhost:8000",
   "dependencies": {
     "@clerk/clerk-react": "^5.17.2",
     "axios": "^1.7.8",
