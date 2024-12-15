@@ -123,7 +123,7 @@ const RecipeRecommender = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/gemini-recommend",
+        "http://localhost:8000/api/gemini-recommend",
         {
           clerkUserId: user.id,
           cuisine,
