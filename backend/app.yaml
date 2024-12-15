@@ -11,11 +11,9 @@ handlers:
 
 env_variables:
   NODE_ENV: "production"
-  CORS_ORIGIN: "https://frontend-dot-smart-recipe-hub.uc.r.appspot.com"
-  GEMINI_LINK: AIzaSyB13QU7allkWvRRMQMfcMv9Fa0zGo5L-5U
-  MONGO_URI: mongodb+srv://rk10069n:Ul3wxgqrd5mmyEr6@cluster-fsproject.3zgwp.mongodb.net/?retryWrites=true&w=majority&appName=cluster-FSproject
-  PEXELS_API_KEY: Knt9h2G0AQQSR7uJYJynQCqbR5Gvj0WAGKiLFaZ5bjhyKruGIE8FhwgK
-
+  CORS_ORIGIN: "https://smart-recipe-hub-444400.uc.r.appspot.com/"
+  GEMINI_LINK: "AIzaSyB13QU7allkWvRRMQMfcMv9Fa0zGo5L-5U"
+  MONGO_URI: "mongodb+srv://rk10069n:Ul3wxgqrd5mmyEr6@cluster-fsproject.3zgwp.mongodb.net/recipe-hub?retryWrites=true&w=majority&appName=cluster-FSproject"
 
 automatic_scaling:
   target_cpu_utilization: 0.65
