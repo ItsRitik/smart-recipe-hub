@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import Markdown from "react-markdown";
@@ -14,106 +14,14 @@ import {
   Modal,
 } from "react-bootstrap";
 
-// RecipeCard Component
-const RecipeCard = ({ recipe }) => {
-  const [showModal, setShowModal] = useState(false);
+import "./recipeRecommender.css";
 
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-
-  return (
-    <>
-      <Card
-        className="mb-4 shadow-sm recipe-card"
-        style={{
-          cursor: "pointer",
-          transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.03)";
-          e.currentTarget.style.boxShadow = "0 10px 25px rgba(0, 0, 0, 0.2)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-        }}
-      >
-        <Card.Img
-          variant="top"
-          src={recipe?.image || "https://via.placeholder.com/300"}
-          alt={recipe?.title || "Recipe Image"}
-          style={{
-            objectFit: "cover",
-            height: "200px",
-            borderTopLeftRadius: "8px",
-            borderTopRightRadius: "8px",
-          }}
-        />
-        <Card.Body className="text-center">
-          <Card.Title className="fw-bold">
-            {recipe?.title || "No Title"}
-          </Card.Title>
-          <Card.Text className="text-muted mb-3">
-            {recipe?.description || "A delicious recipe to try out!"}
-          </Card.Text>
-          <Button
-            variant="outline-primary"
-            size="sm"
-            className="mt-2"
-            onClick={handleShowModal}
-          >
-            View Details
-          </Button>
-        </Card.Body>
-      </Card>
-
-      {/* Modal for Viewing Recipe Details */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>{recipe?.title || "Recipe Details"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Card.Img
-            variant="top"
-            src={recipe?.image || "https://via.placeholder.com/300"}
-            alt={recipe?.title || "Recipe Image"}
-            style={{
-              objectFit: "cover",
-              maxHeight: "300px",
-              marginBottom: "20px",
-              borderRadius: "8px",
-            }}
-          />
-          <h5>Instructions</h5>
-          {recipe?.steps ? (
-            <div>
-              {recipe.steps.split("\n").map((step, index) => (
-                <p key={index}>
-                  <Markdown>{step}</Markdown>
-                </p>
-              ))}
-            </div>
-          ) : (
-            <p>No instructions available.</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
-};
-
-// RecipeRecommender Component
 const RecipeRecommender = () => {
   const { user } = useUser(); // Clerk user data
   const [cuisine, setCuisine] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [recommendations, setRecommendations] = useState([]);
-
+  const [selectedRecipe, setSelectedRecipe] = useState(null); // To store the selected recipe for the modal
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -131,8 +39,11 @@ const RecipeRecommender = () => {
           ingredients: ingredients.split(",").map((item) => item.trim()),
         }
       );
+
+      // Log the response to verify the structure
+      console.log("API Response:", response.data.recommendations);
+
       setRecommendations(response.data.recommendations);
-      console.log(response.data.recommendations);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setError("Failed to fetch recipe recommendations. Please try again.");
@@ -141,11 +52,21 @@ const RecipeRecommender = () => {
     }
   };
 
+  const handleModalShow = (recipe) => {
+    setSelectedRecipe(recipe);
+  };
+
+  const handleModalClose = () => {
+    setSelectedRecipe(null);
+  };
+
   return (
     <Container fluid className="py-5">
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
-          <h2 className="text-center mb-4">AI Recipe Recommender</h2>
+          <h2 className="text-center mb-4" style={{ fontSize: "1.5rem" }}>
+            AI Generated Recipes
+          </h2>
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Cuisine Type</Form.Label>
@@ -199,10 +120,78 @@ const RecipeRecommender = () => {
               md={4}
               className="d-flex justify-content-center"
             >
-              <RecipeCard recipe={rec} />
+              <Card className="recipe-card mb-4 shadow-lg">
+                <Card.Img
+                  variant="top"
+                  src={rec?.image || "https://via.placeholder.com/300"}
+                  alt={rec?.title || "Recipe Image"}
+                  className="card-img"
+                />
+                <Card.Body className="text-center">
+                  <Card.Title className="recipe-card-title fw-bold">
+                    {rec?.title || "Recipe Name Unavailable"}
+                  </Card.Title>
+                  <Card.Text className="recipe-card-text">
+                    {rec?.description || "A delicious recipe to try out!"}
+                  </Card.Text>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mt-2 recipe-card-button"
+                    onClick={() => handleModalShow(rec)}
+                  >
+                    View Details
+                  </Button>
+                </Card.Body>
+              </Card>
             </Col>
           ))}
         </Row>
+      )}
+
+      {/* Modal for Viewing Recipe Details */}
+      {selectedRecipe && (
+        <Modal
+          show={!!selectedRecipe}
+          onHide={handleModalClose}
+          centered
+          size="lg"
+          dialogClassName="modal-dialog-scrollable"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedRecipe?.title || "Recipe Details"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Card.Img
+              variant="top"
+              src={selectedRecipe?.image || "https://via.placeholder.com/300"}
+              alt={selectedRecipe?.title || "Recipe Image"}
+              style={{
+                objectFit: "cover",
+                maxHeight: "300px",
+                marginBottom: "20px",
+                borderRadius: "8px",
+              }}
+            />
+            <h5>Instructions</h5>
+            {selectedRecipe?.steps ? (
+              <div>
+                {selectedRecipe.steps.split("\n").map((step, index) => (
+                  <p key={index}>
+                    <Markdown>{step}</Markdown>
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p>No instructions available.</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleModalClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       )}
     </Container>
   );
