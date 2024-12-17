@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const SignUpSuccessPage = () => {
+  
   const { user } = useUser(); // Get Clerk user data
   const navigate = useNavigate(); // For redirection
   const [loading, setLoading] = useState(true);

@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const GeminiRoute = require("./routes/gemini"); // User Routes
 const UserRoute = require("./routes/user");
+const recipeRoutes = require("./routes/add-recipe");
 
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 // Routes
 app.use("/api", GeminiRoute); // User Routes (Public)
 app.use("/api", UserRoute);
+app.use("/api", recipeRoutes);
 
 
 // Start the server

@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddRecipe = () => {
+  const { user } = useUser(); // Fetch the logged-in user
   const [recipeData, setRecipeData] = useState({
     title: "",
     description: "",
@@ -9,6 +12,7 @@ const AddRecipe = () => {
     ingredients: [{ item: "", quantity: "" }],
     image: null,
   });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,11 +45,30 @@ const AddRecipe = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(recipeData);
-    alert("Recipe Submitted Successfully!");
+
+    const formData = new FormData();
+    formData.append("title", recipeData.title);
+    formData.append("description", recipeData.description);
+    formData.append("instructions", recipeData.instructions);
+    formData.append("ingredients", JSON.stringify(recipeData.ingredients));
+    formData.append("image", recipeData.image);
+    formData.append("userId", user.id); 
+    formData.append("username", user.username); 
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/add-recipe", formData);
+      console.log("Recipe added successfully:", response.data);
+      alert("Recipe added successfully!");
+    } catch (error) {
+      console.error("Error submitting recipe:", error);
+      console.log(user.username);
+      alert("Failed to add recipe. Please try again.");
+    }
   };
+
+
 
   return (
     <div className="container d-flex justify-content-center align-items-center my-5">
