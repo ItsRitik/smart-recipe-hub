@@ -1,7 +1,9 @@
 
 import RecipeCard from "./RecipeCard";
-
+import { useUser } from "@clerk/clerk-react";
 const HomePage = () => {
+    const { user } = useUser(); // Get Clerk user data
+    console.log(user)
   const recipes = [
     {
       title: "Chicken Biryani",
@@ -41,6 +43,7 @@ const HomePage = () => {
       
     },
   ];
+
 
   return (
     <div>

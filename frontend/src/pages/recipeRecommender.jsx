@@ -110,11 +110,10 @@ const RecipeCard = ({ recipe }) => {
 
 // RecipeRecommender Component
 const RecipeRecommender = () => {
-  const { user } = useUser(); // Clerk user data
+  const { user } = useUser();
   const [cuisine, setCuisine] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [recommendations, setRecommendations] = useState([]);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -125,7 +124,7 @@ const RecipeRecommender = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/gemini-recommend",
+        "http://localhost:8000/api/gemini-recommend",
         {
           clerkUserId: user.id,
           cuisine,
@@ -139,6 +138,11 @@ const RecipeRecommender = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getEmbedUrl = (videoUrl) => {
+    const urlMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/))([^&?/\s]+)/);
+    return urlMatch ? `https://www.youtube.com/embed/${urlMatch[1]}` : null;
   };
 
   return (

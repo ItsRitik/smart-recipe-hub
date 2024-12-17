@@ -3,6 +3,7 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import {
   SignInButton,
+  SignUpButton,
   UserButton,
   SignedIn,
   SignedOut,
@@ -30,11 +31,16 @@ const NavigationBar = () => {
           </Nav>
           <Nav>
             <SignedOut>
-              <SignInButton mode="modal">
-                <button className="btn btn-outline-light">Sign In</button>
+              {/* Redirect to the dedicated sign-in and sign-up pages */}
+              <SignInButton redirectUrl="/sign-in">
+                <button className="btn btn-outline-light me-2">Sign In</button>
               </SignInButton>
+              <SignUpButton redirectUrl="/sign-up">
+                <button className="btn btn-outline-light">Sign Up</button>
+              </SignUpButton>
             </SignedOut>
             <SignedIn>
+              {/* Show the UserButton when signed in */}
               <UserButton />
             </SignedIn>
           </Nav>

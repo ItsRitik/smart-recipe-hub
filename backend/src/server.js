@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const { MongoClient, ServerApiVersion } = require("mongodb");
 const dotenv = require("dotenv");
-const userRoutes = require("./routes/User");
+const GeminiRoute = require("./routes/gemini"); // User Routes
+const UserRoute = require("./routes/user");
+
 
 dotenv.config();
 
@@ -15,44 +15,15 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// // MongoDB Connection with Stable API Version
-// const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 
-// async function connectToDatabase() {
-//   try {
-//     // Connect to MongoDB using Mongoose and client options
-//     await mongoose.connect(process.env.MONGO_URI, clientOptions);
-//     console.log("MongoDB connected successfully!");
-//   } catch (err) {
-//     console.error("MongoDB connection failed", err);
-//   }
-// }
 
-// // Connect to MongoDB
-// connectToDatabase();
-const client = new MongoClient(process.env.MONGO_URI, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-async function run() {
-  try {
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
 
-app.use("/api", userRoutes);
+// run().catch(console.dir);
+
+// Routes
+app.use("/api", GeminiRoute); // User Routes (Public)
+app.use("/api", UserRoute);
+
 
 // Start the server
 app.listen(PORT, () => {
