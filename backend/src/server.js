@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const GeminiRoute = require("./routes/gemini"); // User Routes
 const UserRoute = require("./routes/user");
-const recipeRoutes = require("./routes/add-recipe");
+const recipeRoutes = require("./routes/recipe");
 
 
 dotenv.config();
