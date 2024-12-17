@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RecipeCard from "./RecipeCard";
-import axios from "axios";
+import apiClient from "../services/apiClient";
+
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]); // State to store recipes
@@ -9,7 +10,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/all-recipes");
+        const response = await apiClient.get("/api/all-recipes");
         setRecipes(response.data.recipes); // Store recipes in state
         setLoading(false);
       } catch (error) {
@@ -26,7 +27,7 @@ const HomePage = () => {
       <h2 className="text-center mb-4">All Recipes</h2>
       {loading ? (
         <p className="text-center">Loading recipes...</p>
-      ) : recipes.length > 0 ? (
+      ) : recipes?.length > 0 ? (
         <div className="row">
           {recipes?.map((recipe, index) => (
             <div key={index} className=" mb-4">

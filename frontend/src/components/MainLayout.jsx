@@ -3,10 +3,6 @@ import { Link, Outlet } from "react-router-dom";
 import NavigationBar from "../components/Navbar";
 import {
   ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
 } from "@clerk/clerk-react";
 import { Container } from "react-bootstrap";
 
