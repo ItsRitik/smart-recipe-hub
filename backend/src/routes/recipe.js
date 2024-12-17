@@ -131,5 +131,58 @@ router.get("/all-recipes", async (req, res) => {
       res.status(500).json({ message: "Server Error", error: error.message });
     }
   });
+
+  router.get("/recipes/user/:userId", async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+  
+      // Connect to MongoDB
+      const db = await connectDB();
+      const recipesCollection = db.collection("recipes");
+  
+      // Find all recipes for the user
+      const userRecipes = await recipesCollection.find({ userId: userId }).toArray();
+  
+      res.status(200).json({
+        message: "Recipes fetched successfully!",
+        recipes: userRecipes,
+      });
+    } catch (error) {
+      console.error("Error fetching user's recipes:", error.message);
+      res.status(500).json({ message: "Server Error", error: error.message });
+    }
+  });
+
+  // DELETE Route: Delete a specific recipe
+router.delete("/recipes/:recipeId", async (req, res) => {
+  const { recipeId } = req.params;
+
+  try {
+    if (!recipeId) {
+      return res.status(400).json({ message: "Recipe ID is required" });
+    }
+
+    // Connect to MongoDB
+    const db = await connectDB();
+    const recipesCollection = db.collection("recipes");
+
+    // Delete the recipe by ID
+    const result = await recipesCollection.deleteOne({ _id: new ObjectId(recipeId) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "Recipe not found or already deleted" });
+    }
+
+    res.status(200).json({ message: "Recipe deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting recipe:", error.message);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
   
 module.exports = router;
