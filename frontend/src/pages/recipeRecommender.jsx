@@ -23,22 +23,24 @@ const RecipeCard = ({ recipe }) => {
     <>
       <Card className="mb-4 shadow-lg">
         <Row className="g-0">
-          {/* Recipe Image (Mobile-First: Full Width on Small Screens) */}
-          <Col xs={12} md={4}>
-            <Card.Img
-              src={recipe?.image || "https://via.placeholder.com/300"}
-              alt={recipe?.title || "Recipe Image"}
-              style={{
-                objectFit: "cover",
-                width: "100%",
-                height: "200px",
-                borderRadius: "8px 8px 0 0",
-              }}
-            />
-          </Col>
+          {/* Recipe Image */}
+          {recipe?.image && (
+            <Col xs={12} md={4}>
+              <Card.Img
+                src={recipe.image}
+                alt={recipe?.title || "Recipe Image"}
+                style={{
+                  objectFit: "cover",
+                  width: "100%",
+                  height: "200px",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              />
+            </Col>
+          )}
 
           {/* Recipe Details */}
-          <Col xs={12} md={8} className="p-4 d-flex flex-column">
+          <Col xs={12} md={recipe?.image ? 8 : 12} className="p-4 d-flex flex-column">
             <Card.Body className="p-0">
               <Card.Title className="fw-bold mb-3">
                 {recipe?.title || "No Title"}
@@ -89,15 +91,17 @@ const RecipeCard = ({ recipe }) => {
         <Modal.Body>
           <Row>
             {/* Modal Image */}
-            <Col xs={12} md={4} className="mb-3">
-              <img
-                src={recipe?.image || "https://via.placeholder.com/300"}
-                alt={recipe?.title || "Recipe Image"}
-                className="img-fluid rounded"
-              />
-            </Col>
+            {recipe?.image && (
+              <Col xs={12} md={4} className="mb-3">
+                <img
+                  src={recipe.image}
+                  alt={recipe?.title || "Recipe Image"}
+                  className="img-fluid rounded"
+                />
+              </Col>
+            )}
             {/* Recipe Content */}
-            <Col xs={12} md={8}>
+            <Col xs={12} md={recipe?.image ? 8 : 12}>
               <h5>Instructions:</h5>
               {recipe?.steps ? (
                 <div style={{ maxHeight: "400px", overflowY: "auto" }}>
@@ -123,6 +127,7 @@ const RecipeCard = ({ recipe }) => {
   );
 };
 
+
 // RecipeRecommender Component
 const RecipeRecommender = () => {
   const { user } = useUser();
@@ -136,7 +141,7 @@ const RecipeRecommender = () => {
     setLoading(true);
     setError("");
     setRecommendations([]);
-
+  
     try {
       const response = await axios.post(
         "http://localhost:8000/api/gemini-recommend",
@@ -146,7 +151,19 @@ const RecipeRecommender = () => {
           ingredients: ingredients.split(",").map((item) => item.trim()),
         }
       );
-      setRecommendations(response.data.recommendations);
+  
+      // Clean up the response
+      const cleanedRecommendations = response.data.recommendations.map((rec) => {
+        return {
+          ...rec,
+          title: rec.title.replace(/\*\*Recipe\s\*\*\s?/i, "").trim(), // Remove "**Recipe **"
+          steps: rec.steps
+            .replace(/\*\*Recipe Title:\*\*\s.*?\n/i, "") // Remove "**Recipe Title:** ..."
+            .trim(),
+        };
+      });
+  
+      setRecommendations(cleanedRecommendations);
     } catch (err) {
       console.error("Error fetching recommendations:", err);
       setError("Failed to fetch recipe recommendations. Please try again.");
@@ -154,6 +171,7 @@ const RecipeRecommender = () => {
       setLoading(false);
     }
   };
+  
 
   const getEmbedUrl = (videoUrl) => {
     const urlMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/))([^&?/\s]+)/);
