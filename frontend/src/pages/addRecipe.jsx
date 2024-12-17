@@ -46,7 +46,14 @@ const AddRecipe = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Verify the file is selected
+    if (!recipeData.image) {
+      alert("Please upload an image.");
+      return;
+    }
+  
+    // Construct FormData for API submission
     const formData = new FormData();
     formData.append("title", recipeData.title);
     formData.append("description", recipeData.description);
@@ -54,22 +61,29 @@ const AddRecipe = () => {
     formData.append("ingredients", JSON.stringify(recipeData.ingredients));
     formData.append("image", recipeData.image);
     formData.append("userId", user.id);
-    formData.append("username", user.username);
-
+    formData.append("username", user.username );
+  
     try {
-      const response = await apiClient.post(
-        "/api/add-recipe",
-        formData
-      );
+      console.log("Submitting Recipe Data:", formData);
+  
+      const response = await apiClient.post("/api/add-recipe", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Axios will handle the boundary
+        },
+      });
+  
       console.log("Recipe added successfully:", response.data);
       alert("Recipe added successfully!");
     } catch (error) {
-      console.error("Error submitting recipe:", error);
-      console.log(user.username);
-      alert("Failed to add recipe. Please try again.");
+      console.error("Error submitting recipe:", error.response || error.message);
+      alert(
+        `Failed to add recipe: ${
+          error.response?.data?.message || "Server error, please try again."
+        }`
+      );
     }
   };
-
+  
   return (
     <div className="container d-flex justify-content-center align-items-center my-5">
       <div
