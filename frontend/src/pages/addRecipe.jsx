@@ -13,7 +13,6 @@ const AddRecipe = () => {
     image: null,
   });
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRecipeData((prevState) => ({
@@ -54,11 +53,14 @@ const AddRecipe = () => {
     formData.append("instructions", recipeData.instructions);
     formData.append("ingredients", JSON.stringify(recipeData.ingredients));
     formData.append("image", recipeData.image);
-    formData.append("userId", user.id); 
-    formData.append("username", user.username); 
+    formData.append("userId", user.id);
+    formData.append("username", user.username);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/add-recipe", formData);
+      const response = await axios.post(
+        "http://localhost:8000/api/add-recipe",
+        formData
+      );
       console.log("Recipe added successfully:", response.data);
       alert("Recipe added successfully!");
     } catch (error) {
@@ -68,12 +70,15 @@ const AddRecipe = () => {
     }
   };
 
-
-
   return (
     <div className="container d-flex justify-content-center align-items-center my-5">
-      <div className="card shadow-lg bg-dark text-light p-4" style={{ width: "1000px", borderRadius: "15px" }}>
-        <h2 className="card-title text-center text-warning mb-4">Add New Recipe</h2>
+      <div
+        className="card shadow-lg bg-dark text-light p-4"
+        style={{ width: "1000px", borderRadius: "15px" }}
+      >
+        <h2 className="card-title text-center text-warning mb-4">
+          Add New Recipe
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="title" className="form-label">
@@ -130,7 +135,9 @@ const AddRecipe = () => {
                     className="form-control"
                     placeholder={`Ingredient ${index + 1}`}
                     value={ingredient.item}
-                    onChange={(e) => handleIngredientChange(index, "item", e.target.value)}
+                    onChange={(e) =>
+                      handleIngredientChange(index, "item", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -140,7 +147,9 @@ const AddRecipe = () => {
                     className="form-control"
                     placeholder={`Quantity ${index + 1}`}
                     value={ingredient.quantity}
-                    onChange={(e) => handleIngredientChange(index, "quantity", e.target.value)}
+                    onChange={(e) =>
+                      handleIngredientChange(index, "quantity", e.target.value)
+                    }
                     required
                   />
                 </div>
