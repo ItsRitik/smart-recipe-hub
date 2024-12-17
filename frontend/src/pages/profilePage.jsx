@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
-import axios from "axios"; // Import Axios
+import apiClient from "../services/apiClient";
 import "./ProfilePage.css"; // Import updated styles
 
 const ProfilePage = () => {
@@ -11,8 +11,8 @@ const ProfilePage = () => {
     const fetchUserRecipes = async () => {
       if (user) {
         try {
-          const response = await axios.get(
-            `http://localhost:8000/api/recipes/user/${user.id}`
+          const response = await apiClient.get(
+            `/api/recipes/user/${user.id}`
           );
           setUserRecipes(response.data.recipes);
         } catch (error) {
@@ -25,8 +25,8 @@ const ProfilePage = () => {
 
   const handleDeleteRecipe = async (id) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:8000/api/recipes/${id}`
+      const response = await apiClient.delete(
+        `/api/recipes/${id}`
       );
       if (response.status === 200) {
         setUserRecipes(userRecipes.filter((recipe) => recipe._id !== id));

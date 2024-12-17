@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
+import apiClient from "../services/apiClient";
 import Markdown from "react-markdown";
 import {
   Container,
@@ -143,8 +144,8 @@ const RecipeRecommender = () => {
     setRecommendations([]);
   
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/gemini-recommend",
+      const response = await apiClient.post(
+        "/api/gemini-recommend",
         {
           clerkUserId: user.id,
           cuisine,

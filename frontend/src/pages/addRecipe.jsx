@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddRecipe = () => {
@@ -57,8 +57,8 @@ const AddRecipe = () => {
     formData.append("username", user.username);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/add-recipe",
+      const response = await apiClient.post(
+        "/api/add-recipe",
         formData
       );
       console.log("Recipe added successfully:", response.data);

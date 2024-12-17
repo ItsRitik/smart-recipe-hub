@@ -1,9 +1,7 @@
 import "./RecipeCard.css";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import { useUser } from "@clerk/clerk-react";
-
-
 
 // Helper function to split array
 const chunkArray = (array, size) => {
@@ -36,8 +34,8 @@ const RecipeCard = ({ recipe }) => {
 
     try {
       // API call to add comment
-      const response = await axios.post(
-        `http://localhost:8000/api/recipes/${recipe._id}/comments`,
+      const response = await apiClient.post(
+        `/api/recipes/${recipe._id}/comments`,
         {
           userId: user.id, // Clerk User ID
           username: user.username || "Anonymous", // User's name
