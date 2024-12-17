@@ -13,93 +13,108 @@ import {
   Card,
   Modal,
 } from "react-bootstrap";
-import Loader from "./Loader"; // Import the Loader component
+import Loader from "./Loader";
 
 // RecipeCard Component
 const RecipeCard = ({ recipe }) => {
   const [showModal, setShowModal] = useState(false);
 
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-
   return (
     <>
-      <Card
-        className="mb-4 shadow-sm recipe-card"
-        style={{
-          cursor: "pointer",
-          transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.03)";
-          e.currentTarget.style.boxShadow = "0 10px 25px rgba(0, 0, 0, 0.2)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-        }}
-      >
-        <Card.Img
-          variant="top"
-          src={recipe?.image || "https://via.placeholder.com/300"}
-          alt={recipe?.title || "Recipe Image"}
-          style={{
-            objectFit: "cover",
-            height: "200px",
-            borderTopLeftRadius: "8px",
-            borderTopRightRadius: "8px",
-          }}
-        />
-        <Card.Body className="text-center">
-          <Card.Title className="fw-bold">
-            {recipe?.title || "No Title"}
-          </Card.Title>
-          <Card.Text className="text-muted mb-3">
-            {recipe?.description || "A delicious recipe to try out!"}
-          </Card.Text>
-          <Button
-            variant="outline-primary"
-            size="sm"
-            className="mt-2"
-            onClick={handleShowModal}
-          >
-            View Details
-          </Button>
-        </Card.Body>
+      <Card className="mb-4 shadow-lg">
+        <Row className="g-0">
+          {/* Recipe Image (Mobile-First: Full Width on Small Screens) */}
+          <Col xs={12} md={4}>
+            <Card.Img
+              src={recipe?.image || "https://via.placeholder.com/300"}
+              alt={recipe?.title || "Recipe Image"}
+              style={{
+                objectFit: "cover",
+                width: "100%",
+                height: "200px",
+                borderRadius: "8px 8px 0 0",
+              }}
+            />
+          </Col>
+
+          {/* Recipe Details */}
+          <Col xs={12} md={8} className="p-4 d-flex flex-column">
+            <Card.Body className="p-0">
+              <Card.Title className="fw-bold mb-3">
+                {recipe?.title || "No Title"}
+              </Card.Title>
+              <h6 className="mb-2">Instructions:</h6>
+              {recipe?.steps ? (
+                <div
+                  style={{
+                    maxHeight: "100px",
+                    overflowY: "scroll",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                  }}
+                >
+                  {recipe.steps.split("\n").map((step, index) => (
+                    <p key={index} className="mb-1">
+                      <Markdown>{step}</Markdown>
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p>No instructions available.</p>
+              )}
+            </Card.Body>
+
+            <Button
+              variant="outline-primary"
+              size="sm"
+              className="mt-auto"
+              onClick={() => setShowModal(true)}
+            >
+              View Recipe
+            </Button>
+          </Col>
+        </Row>
       </Card>
 
-      {/* Modal for Viewing Recipe Details */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
+      {/* Full-Screen Recipe Modal */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="lg"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>{recipe?.title || "Recipe Details"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Card.Img
-            variant="top"
-            src={recipe?.image || "https://via.placeholder.com/300"}
-            alt={recipe?.title || "Recipe Image"}
-            style={{
-              objectFit: "cover",
-              maxHeight: "300px",
-              marginBottom: "20px",
-              borderRadius: "8px",
-            }}
-          />
-          <h5>Instructions</h5>
-          {recipe?.steps ? (
-            <div>
-              {recipe.steps.split("\n").map((step, index) => (
-                <p key={index}>
-                  <Markdown>{step}</Markdown>
-                </p>
-              ))}
-            </div>
-          ) : (
-            <p>No instructions available.</p>
-          )}
+          <Row>
+            {/* Modal Image */}
+            <Col xs={12} md={4} className="mb-3">
+              <img
+                src={recipe?.image || "https://via.placeholder.com/300"}
+                alt={recipe?.title || "Recipe Image"}
+                className="img-fluid rounded"
+              />
+            </Col>
+            {/* Recipe Content */}
+            <Col xs={12} md={8}>
+              <h5>Instructions:</h5>
+              {recipe?.steps ? (
+                <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+                  {recipe.steps.split("\n").map((step, index) => (
+                    <p key={index}>
+                      <Markdown>{step}</Markdown>
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p>No instructions available.</p>
+              )}
+            </Col>
+          </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
             Close
           </Button>
         </Modal.Footer>
@@ -149,8 +164,9 @@ const RecipeRecommender = () => {
     <>
       {loading && <Loader />}
       <Container fluid className="py-5">
-        <Row className="justify-content-center">
-          <Col xs={12} md={8} lg={6}>
+        <Row>
+          {/* Left Panel: AI Recommender Inputs */}
+          <Col md={5} className="border-end">
             <h2 className="text-center mb-4">AI Recipe Recommender</h2>
             <Form>
               <Form.Group className="mb-3">
@@ -191,21 +207,21 @@ const RecipeRecommender = () => {
                 {error}
               </Alert>
             )}
-            {recommendations?.length > 0 && (
-              <Row className="mt-5 justify-content-center">
-                <h3 className="text-center mb-4">Recommended Recipes</h3>
+          </Col>
+
+          {/* Right Panel: Recommended Recipes */}
+          <Col md={7} className="p-4">
+            <h3 className="text-center mb-4">Recommended Recipes</h3>
+            {recommendations.length > 0 ? (
+              <div style={{ maxHeight: "70vh", overflowY: "auto" }}>
                 {recommendations.map((rec, index) => (
-                  <Col
-                    key={index}
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    className="d-flex justify-content-center"
-                  >
-                    <RecipeCard recipe={rec} />
-                  </Col>
+                  <RecipeCard key={index} recipe={rec} />
                 ))}
-              </Row>
+              </div>
+            ) : (
+              <p className="text-center text-muted">
+                No recipes to display. Please submit your preferences!
+              </p>
             )}
           </Col>
         </Row>
