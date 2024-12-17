@@ -1,49 +1,66 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-require("dotenv").config();
-
+const { connectDB } = require("../services/db"); // Import centralized DB connection
 const router = express.Router();
+const crypto = require("crypto");
 
-// Initialize Gemini API Client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_LINK);
+// Middleware to validate webhook
+function verifyClerkWebhook(req, res, next) {
+  const signature = req.headers["clerk-signature"];
+  const secret = "whsec_AWFp1n/i4EHVw50vzqgZY/bxNi0dotoY"; // From Clerk Dashboard
 
-// Route to generate recipe recommendations
-router.post("/gemini-recommend", async (req, res) => {
-  const { cuisine, ingredients } = req.body;
+  if (!signature) {
+    return res.status(400).send("Missing signature.");
+  }
 
-  if (!cuisine || !ingredients) {
-    return res.status(400).json({ message: "Cuisine and ingredients are required." });
+  const payload = JSON.stringify(req.body);
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+
+  if (signature !== expectedSignature) {
+    return res.status(401).send("Invalid signature.");
+  }
+
+  next();
+}
+
+
+router.post("/save-user", async (req, res) => {
+  console.log("Incoming Request Body:", req.body);
+
+  const { clerkUserId, email, name } = req.body;
+
+  if (!clerkUserId || !email || !name) {
+    console.error("❌ Invalid user data received:", req.body);
+    return res.status(400).json({ message: "Invalid user data" });
   }
 
   try {
-    // Build the AI prompt
-    const prompt = `
-      Suggest a recipe based on the following:
-      - Cuisine: ${cuisine}
-      - Ingredients: ${ingredients.join(", ")}
-      Provide:
-      - Recipe Title
-      - Steps to prepare the dish
-    `;
+    const db = await connectDB();
+    const usersCollection = db.collection("users");
 
-    // Send prompt to Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(prompt);
+    const existingUser = await usersCollection.findOne({ clerkUserId });
+    if (existingUser) {
+      return res.status(200).json({ message: "User already exists" });
+    }
 
-    const responseText = result.response.text();
-
-    // Example parsing of response text into a recipe object
-    const recommendation = {
-      title: "AI Generated Recipe",
-      steps: responseText,
-      image: "https://via.placeholder.com/300", // Placeholder image for now
+    const newUser = {
+      clerkUserId,
+      email,
+      name,
+      createdAt: new Date(),
     };
 
-    res.status(200).json({ recommendations: [recommendation] }); // Ensure it returns an array
+    await usersCollection.insertOne(newUser);
+    console.log("✅ User saved successfully:", newUser);
+    return res.status(201).json({ message: "User saved successfully" });
   } catch (error) {
-    console.error("Error generating recipe:", error.message);
-    res.status(500).json({ message: "Failed to fetch recipe recommendations." });
+    console.error("❌ Error saving user data:", error.message);
+    return res.status(500).json({ message: "Failed to save user data" });
   }
 });
+
+
 
 module.exports = router;

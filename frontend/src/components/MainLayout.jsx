@@ -20,7 +20,7 @@ if (!PUBLISHABLE_KEY) {
 
 const MainLayout = () => {
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} signUpForceRedirectUrl="/sign-up-success"  afterSignOutUrl="/">
       <div className="d-flex flex-column vh-100">
         {/* Sticky Navbar */}
         <header>

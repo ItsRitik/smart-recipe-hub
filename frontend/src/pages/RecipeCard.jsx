@@ -1,20 +1,11 @@
-/* eslint-disable react/prop-types */
-
 import "./RecipeCard.css";
-
 import { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
 
-// Helper function to generate random usernames
-const generateRandomUsername = () => {
-  const adjectives = ["Happy", "Quick", "Bright", "Clever", "Chill", "Cool"];
-  const nouns = ["Chef", "Foodie", "Cook", "Taster", "Baker", "Critic"];
-  const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-  return `${randomAdj}${randomNoun}${Math.floor(Math.random() * 100)}`;
-};
 
-// Helper function to chunk ingredients into groups of 6
+
+// Helper function to split array
 const chunkArray = (array, size) => {
   const result = [];
   for (let i = 0; i < array.length; i += size) {
@@ -24,25 +15,49 @@ const chunkArray = (array, size) => {
 };
 
 const RecipeCard = ({ recipe }) => {
+  const { user } = useUser(); // Get Clerk user data
   const [showModal, setShowModal] = useState(false);
+  const [comments, setComments] = useState(recipe.comments || []); // Existing comments
+  const [newComment, setNewComment] = useState(""); // Input for new comment
+  const [isSubmitting, setIsSubmitting] = useState(false); // For button loading state
 
   const handleModalOpen = () => setShowModal(true);
   const handleModalClose = () => setShowModal(false);
 
-  // UseEffect to handle body scroll
-  useEffect(() => {
-    if (showModal) {
-      document.body.classList.add("no-scroll");
-    } else {
-      document.body.classList.remove("no-scroll");
+  // Handle adding a comment
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return; // Prevent empty comments
+    if (!user) {
+      alert("You need to be logged in to comment!");
+      return;
     }
-    return () => document.body.classList.remove("no-scroll");
-  }, [showModal]);
 
-  // Use a fallback value for instructions
+    setIsSubmitting(true);
+
+    try {
+      // API call to add comment
+      const response = await axios.post(
+        `http://localhost:8000/api/recipes/${recipe._id}/comments`,
+        {
+          userId: user.id, // Clerk User ID
+          username: user.username || "Anonymous", // User's name
+          text: newComment,
+        }
+      );
+
+      // Update local comments state with the new comment
+      setComments([...comments, response.data.comment]);
+      setNewComment(""); // Clear input field
+    } catch (error) {
+      console.error("Error adding comment:", error.message);
+      alert("Failed to add comment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const instructions = typeof recipe.instructions === "string" ? recipe.instructions : "";
 
-  // Split instructions into list items based on full stop
   const splitInstructions = instructions
     .split(".")
     .map((instruction) => instruction.trim())
@@ -54,7 +69,7 @@ const RecipeCard = ({ recipe }) => {
         {/* Left Column */}
         <div className="col-md-4">
           <img
-            src={recipe.image}
+            src={recipe.imageUrl}
             alt={recipe.title}
             className="img-fluid rounded-start h-100"
             style={{ objectFit: "cover" }}
@@ -73,30 +88,32 @@ const RecipeCard = ({ recipe }) => {
                 <div key={index} className="col-6">
                   <ul className="list-unstyled">
                     {chunk.map((ingredient, idx) => (
-                      <li key={idx}>{ingredient}</li>
+                      <li key={idx}>
+                        {ingredient.item}: {ingredient.quantity}
+                      </li>
                     ))}
                   </ul>
                 </div>
               ))}
             </div>
 
-            <button
-              className="btn btn-primary my-3"
-              onClick={handleModalOpen}
-            >
+            <button className="btn btn-primary my-3" onClick={handleModalOpen}>
               View Instructions
             </button>
+            <p className="text-muted">
+              <small>By {recipe.username}</small>
+            </p>
           </div>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column: Comments Section */}
         <div className="col-md-3 border-start">
           <div className="p-3">
             <h4>Comments:</h4>
             <ul className="list-unstyled">
-              {recipe.comments.map((comment, index) => (
+              {comments.map((comment, index) => (
                 <li key={index}>
-                  <strong>{generateRandomUsername()}:</strong> {comment}
+                  <strong>{comment.username}:</strong> {comment.text}
                 </li>
               ))}
             </ul>
@@ -106,8 +123,16 @@ const RecipeCard = ({ recipe }) => {
                 type="text"
                 placeholder="Add a comment..."
                 className="form-control me-2"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
               />
-              <button className="btn btn-secondary">Add</button>
+              <button
+                className="btn btn-secondary"
+                onClick={handleAddComment}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Adding..." : "Add"}
+              </button>
             </div>
           </div>
         </div>
@@ -135,11 +160,7 @@ const RecipeCard = ({ recipe }) => {
                 </ol>
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleModalClose}
-                >
+                <button type="button" className="btn btn-secondary" onClick={handleModalClose}>
                   Close
                 </button>
               </div>

@@ -9,6 +9,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // Pages
 import HomePage from "./pages/HomePage";
 import SignInPage from "./routes/signInPage/signInPage";
+import SignUpSuccessPage from "./routes/signUpSuccess/signUpSuccessPage";
 import SignUpPage from "./routes/signUpPage/signUpPage";
 import AddRecipePage from "./pages/addRecipe";
 import AIRecommendationPage from "./pages/recipeRecommender";
@@ -20,7 +21,7 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        index: true, // Root path "/"
+        index: true, 
         element: <HomePage />,
       },
       {
@@ -31,6 +32,11 @@ const router = createBrowserRouter([
         path: "/sign-up/*",
         element: <SignUpPage />,
       },
+      {
+        path: "/sign-up-success",
+        element: <SignUpSuccessPage />,
+      },
+      
       {
         path: "/add-recipe",
         element: <AddRecipePage />,
