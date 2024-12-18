@@ -23,8 +23,8 @@ handlers:
 env_variables:
   REACT_APP_API_URL: "https://api.smart-recipe-hub-444400.appspot.com" # Replace with your API service URL
   NODE_ENV: "production"
-  VITE_CLERK_PUBLISHABLE_KEY: "pk_test_YWN0dWFsLWdvb3NlLTQyLmNsZXJrLmFjY291bnRzLmRldiQ"
-  VITE_API_BASE_URL: "https://api-dot-smart-recipe-hub.uc.r.appspot.com"
+  VITE_CLERK_PUBLISHABLE_KEY: "${VITE_CLERK_PUBLISHABLE_KEY}"
+  VITE_API_BASE_URL: "{VITE_API_BASE_URL}"
 
 
 automatic_scaling:
