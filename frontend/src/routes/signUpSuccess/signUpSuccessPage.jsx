@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../services/apiClient";
 
 const SignUpSuccessPage = () => {
   
@@ -21,7 +21,7 @@ const SignUpSuccessPage = () => {
           name: user.username || "Anonymous",
         };
 
-        const response = await axios.post("http://localhost:8000/api/save-user", payload);
+        const response = await apiClient.post("/api/save-user", payload);
         console.log("✅ User saved:", response.data);
 
         // Redirect to homepage after successful save
